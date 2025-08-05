@@ -4,11 +4,35 @@ import 'home_ui_state.dart';
 
 part 'home_ui_view_model.g.dart';
 
+// 合言葉1つ分のスイッチ状態を表すクラス。
+// キーワード文字列と、それが有効かどうかのフラグを保持。
+class KeywordToggle {
+  final String keyword; // 合言葉文字列
+  final bool isActive;  // この合言葉が有効かどうか
+
+  const KeywordToggle({
+    required this.keyword,
+    required this.isActive,
+  });
+
+  // 個別のフィールドのみを更新した新しいインスタンスを返す。
+  KeywordToggle copyWith({String? keyword, bool? isActive}) {
+    return KeywordToggle(
+      keyword: keyword ?? this.keyword,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+}
+
 @riverpod
 class HomeUiViewModel extends _$HomeUiViewModel {
   @override
   HomeUiState build() {
-    return const HomeUiState();
+    return const HomeUiState(keywordToggles: [
+      KeywordToggle(keyword: '合言葉1', isActive: true),
+      KeywordToggle(keyword: '合言葉2', isActive: false),
+      KeywordToggle(keyword: '合言葉3', isActive: true),
+    ]);
   }
 
   /// 音声検知のON/OFFを切り替える
