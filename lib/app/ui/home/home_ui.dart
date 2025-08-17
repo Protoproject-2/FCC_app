@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'home_ui_view_model.dart';
 
-class HomeUi extends ConsumerWidget {
-  const HomeUi({super.key});
+class HomeUI extends ConsumerWidget {
+  const HomeUI({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,10 +23,13 @@ class HomeUi extends ConsumerWidget {
               onTap: viewModel.toggleDetection,
               child: CircleAvatar(
                 radius: 60,
-                backgroundColor: Colors.grey[300],
+                backgroundColor: state.isDetecting ? Colors.redAccent : Colors.grey[300],
                 child: Text(
                   state.isDetecting ? '停止' : 'ここを押して\nON/OFF',
                   textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: state.isDetecting ? Colors.white : Colors.black,
+                  ),
                 ),
               ),
             ),
