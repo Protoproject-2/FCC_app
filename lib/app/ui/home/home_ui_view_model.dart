@@ -1,4 +1,5 @@
 
+import 'package:fcc/app/infra/qr_code_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fcc/app/infra/audio_service.dart';
 import 'home_ui_state.dart';
@@ -45,5 +46,11 @@ class HomeUiViewModel extends _$HomeUiViewModel {
     }).toList();
 
     state = state.copyWith(keywordToggles: toggles);
+  }
+
+  void createLineQrCode(String data) {
+    final qrCodeRepository = ref.read(qrCodeRepositoryProvider);
+    final url = qrCodeRepository.createQrCodeUrl(data);
+    state = state.copyWith(qrCodeUrl: url);
   }
 }
