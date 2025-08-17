@@ -4,10 +4,12 @@
 class HomeUiState {
   final bool isDetecting; // 音声検知がONかOFFかの状態
   final List<KeywordToggle> keywordToggles; // 各合言葉のスイッチ状態
+  final String? qrCodeUrl; // QRコードのURL
 
   const HomeUiState({
     this.isDetecting = false,
     required this.keywordToggles,
+    this.qrCodeUrl,
   });
 
   // 状態を部分的に更新するためのメソッド。
@@ -15,10 +17,12 @@ class HomeUiState {
   HomeUiState copyWith({
     bool? isDetecting,
     List<KeywordToggle>? keywordToggles,
+    String? qrCodeUrl,
   }) {
     return HomeUiState(
       isDetecting: isDetecting ?? this.isDetecting,
       keywordToggles: keywordToggles ?? this.keywordToggles,
+      qrCodeUrl: qrCodeUrl ?? this.qrCodeUrl,
     );
   }
 }
