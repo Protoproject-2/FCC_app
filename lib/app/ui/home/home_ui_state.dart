@@ -1,4 +1,3 @@
-import 'package:fcc/app/ui/home/home_ui_view_model.dart';
 
 // UI層の状態を保持するためのクラス。
 // ON/OFF状態や、合言葉のON/OFFスイッチの状態を一括して管理する。
@@ -20,6 +19,25 @@ class HomeUiState {
     return HomeUiState(
       isDetecting: isDetecting ?? this.isDetecting,
       keywordToggles: keywordToggles ?? this.keywordToggles,
+    );
+  }
+}
+
+// 合言葉とその有効/無効状態を保持するクラス
+class KeywordToggle {
+  final String keyword; // 合言葉文字列
+  final bool isActive;  // この合言葉が有効かどうか
+
+  const KeywordToggle({
+    required this.keyword,
+    required this.isActive,
+  });
+
+  // 個別のフィールドのみを更新した新しいインスタンスを返す。
+  KeywordToggle copyWith({String? keyword, bool? isActive}) {
+    return KeywordToggle(
+      keyword: keyword ?? this.keyword,
+      isActive: isActive ?? this.isActive,
     );
   }
 }

@@ -1,43 +1,41 @@
-// Notifier
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:fcc/app/infra/audio_service.dart';
 import 'home_ui_state.dart';
 
 part 'home_ui_view_model.g.dart';
-
-
 
 @riverpod
 class HomeUiViewModel extends _$HomeUiViewModel {
   @override
   HomeUiState build() {
-    return const HomeUiState(keywordToggles: [
-      KeywordToggle(keyword: '合言葉1', isActive: true),
-      KeywordToggle(keyword: '合言葉2', isActive: false),
-      KeywordToggle(keyword: '合言葉3', isActive: true),
-    ]);
-  }
+    // Listen to the isRecordingProvider to update the state accordingly
+    ref.listen<bool>(isRecordingProvider, (previous, next) {
+      state = state.copyWith(isDetecting: next);
+    });
 
-  final String keyword; // 合言葉文字列
-  final bool isActive;  // この合言葉が有効かどうか
-
-  const KeywordToggle({
-    required this.keyword,
-    required this.isActive,
-  });
-
-  // 個別のフィールドのみを更新した新しいインスタンスを返す。
-  KeywordToggle copyWith({String? keyword, bool? isActive}) {
-    return KeywordToggle(
-      keyword: keyword ?? this.keyword,
-      isActive: isActive ?? this.isActive,
+    // Initial state
+    return const HomeUiState(
+      isDetecting: false, // Start with detection off
+      keywordToggles: [
+        KeywordToggle(keyword: '助けて', isActive: true),
+        KeywordToggle(keyword: 'きゃー', isActive: false),
+        KeywordToggle(keyword: '泥棒', isActive: true),
+      ],
     );
   }
-  /// 音声検知のON/OFFを切り替える
+
+  /// Toggles the audio detection ON/OFF
   void toggleDetection() {
-    state = state.copyWith(isDetecting: !state.isDetecting);
+    final audioService = ref.read(audioServiceProvider);
+    if (state.isDetecting) {
+      audioService.stopRecording();
+    } else {
+      audioService.startRecording();
+    }
   }
 
-  /// キーワードを指定して、そのスイッチ状態を反転させる
+  /// Toggles the active state of a specific keyword
   void toggleKeyword(String keyword) {
     final toggles = state.keywordToggles.map((toggle) {
       if (toggle.keyword == keyword) {
