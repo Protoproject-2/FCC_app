@@ -34,11 +34,12 @@ class HomeUI extends ConsumerWidget {
                 ),
               ),
             ),
+            // if(state.isDetecting){
+            //   // popup表示
+            // }
             const SizedBox(height: 24),
-            // アクションボタン3つ(ViewModelは未登録なので空)
             _buildActionButton(Icons.person, '連絡先登録', onPressed: () {}),
             _buildActionButton(Icons.add, '合言葉登録', onPressed: () {}),
-
             // LINEpopupナビゲーション
             _buildFloatingActionButton(Icons.share, 'LINE登録URL共有ボタン',
                 onPressed: () {

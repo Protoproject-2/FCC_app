@@ -26,7 +26,6 @@ class HomeUiViewModel extends _$HomeUiViewModel {
     );
   }
 
-  /// Toggles the audio detection ON/OFF
   void toggleDetection() {
     final audioService = ref.read(audioServiceProvider);
     if (state.isDetecting) {
@@ -36,7 +35,6 @@ class HomeUiViewModel extends _$HomeUiViewModel {
     }
   }
 
-  /// Toggles the active state of a specific keyword
   void toggleKeyword(String keyword) {
     final toggles = state.keywordToggles.map((toggle) {
       if (toggle.keyword == keyword) {
