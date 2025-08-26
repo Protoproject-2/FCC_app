@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'home_ui_view_model.dart';
+import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
 class HomeUI extends ConsumerWidget {
   const HomeUI({super.key});
@@ -45,6 +46,23 @@ class HomeUI extends ConsumerWidget {
                 onPressed: () {
               const lineInviteUrl = 'https://lin.ee/abc1234'; // TODO: 実際のLINE登録URLに差し替えてください
               _showLineQrDialog(context, ref, lineInviteUrl);
+            }),
+            _buildActionButton(Icons.add, 'LINEアカウントでログイン', 
+                onPressed: () async {
+              try {
+                // LINEログイン画面を表示
+                final result = await LineSDK.instance.login(scopes: ["profile", "openid", "email"]);
+                
+                final accessToken = await LineSDK.instance.currentAccessToken;
+
+                final userEmail = result.accessToken.email;
+                // ログイン成功時
+                print("ログイン成功: ${result.userProfile?.displayName}");
+                // ここで result.accessToken なども利用可能
+              } catch (e) {
+                // ログイン失敗時
+                print("ログインエラー: $e");
+              }
             }),
             const Spacer(),
             // 合言葉のスイッチ
