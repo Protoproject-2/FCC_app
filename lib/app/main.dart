@@ -3,10 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fcc/app/ui/home/home_ui.dart';
 import 'package:fcc/app/infra/audio_service.dart';
 import 'package:fcc/app/infra/local_notification_service.dart';
+import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // prepere LINE sdk
+  LineSDK.instance.setup('2007473247').then((_) {
+    print('LineSDK Prepared');
+  });
   runApp(const ProviderScope(child: MyApp()));
 }
 

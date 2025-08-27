@@ -45,3 +45,23 @@ class KeywordToggle {
     );
   }
 }
+
+class LoggedInState {
+  final bool isLoggedIn; // ログイン前か後か
+  final String? pictureUrl; // LINEのアイコン画像
+
+  const LoggedInState({
+    this.isLoggedIn = false,
+    this.pictureUrl,
+  });
+
+  LoggedInState copyWith({
+    bool? isLoggedIn,
+    String? pictureUrl,
+  }) {
+    return LoggedInState(
+      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+      pictureUrl: pictureUrl ?? this.pictureUrl,
+    );
+  }
+}

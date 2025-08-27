@@ -2,7 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'home_ui_view_model.dart';
+import 'home_ui_auth_provider.dart';
+import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
 class HomeUI extends ConsumerWidget {
   const HomeUI({super.key});
@@ -11,9 +14,28 @@ class HomeUI extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeUiViewModelProvider);
     final viewModel = ref.read(homeUiViewModelProvider.notifier);
+    final authState = ref.watch(homeUiAuthProvider);
+    final authVm = ref.read(homeUiAuthProvider.notifier);
+    final accountData = authVm.accountButtonData;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('悲鳴検知アプリ')),
+      appBar: AppBar(
+        title: const Text('悲鳴検知アプリ'),
+        backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+        actions: [
+          _buildAccountButton(
+            accountData,
+            onTap: () async {
+              if (accountData.isLoggedIn) {
+                await authVm.logout();
+              } else {
+                await authVm.login();
+              }
+            },
+          ),
+          const SizedBox(width: 8), 
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -145,6 +167,31 @@ Widget _buildFloatingActionButton(IconData icon, String label, {required VoidCal
         minimumSize: const Size.fromHeight(48),
         backgroundColor: Colors.greenAccent.withOpacity(0.3),
       ),
+    ),
+  );
+}
+
+Widget _buildAccountButton(AccountButtonData data, {required VoidCallback onTap}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Row(
+      children: [
+        CircleAvatar(
+          radius: 20,
+          backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+          backgroundImage: data.isLoggedIn && data.pictureUrl != null
+              ? NetworkImage(data.pictureUrl!)
+              : null,
+          child: data.isLoggedIn && data.pictureUrl != null
+              ? null
+              : const Icon(Icons.person, color: Colors.white),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          data.isLoggedIn ? 'ログアウト' : 'ログイン',
+          style: const TextStyle(color: Colors.black),
+        ),
+      ],
     ),
   );
 }
