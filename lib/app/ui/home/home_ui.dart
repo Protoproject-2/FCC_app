@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'home_ui_view_model.dart';
 import 'home_ui_auth_provider.dart';
+import '../../infra/app_user_service.dart';
+import '../../infra/invite_user_service.dart';
 import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
 class HomeUI extends ConsumerWidget {
@@ -64,9 +66,23 @@ class HomeUI extends ConsumerWidget {
             _buildActionButton(Icons.add, '合言葉登録', onPressed: () {}),
             // LINEpopupナビゲーション
             _buildFloatingActionButton(Icons.share, 'LINE登録URL共有ボタン',
-                onPressed: () {
-              const lineInviteUrl = 'https://lin.ee/abc1234'; // TODO: 実際のLINE登録URLに差し替えてください
-              _showLineQrDialog(context, ref, lineInviteUrl);
+                onPressed: () async {
+              try {
+                // userId は AppUserService.getAppId() などから取得
+                final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
+                await InviteService.fetchInviteUrl(userId);
+
+                // 取得した招待リンクを使う
+                final url = InviteService.inviteUrl;
+                if (url != null) {
+                  print("取得した招待リンク: $url");
+                  _showLineQrDialog(context, ref, url);
+                } else {
+                  print("招待リンクが取得できませんでした");
+                }
+              } catch (e) {
+                print("エラー: $e");
+              }
             }),
             const Spacer(),
             // 合言葉のスイッチ
