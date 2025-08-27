@@ -11,9 +11,6 @@ on:
 jobs:
   flutter_lint:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: AndroidStudioProjects/FCC
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,11 +27,10 @@ jobs:
         run: flutter pub get
 
       - name: Format check (no write)
-        run: dart format --output=none --set-exit-if-changed --dry-run .
+        run: dart format --output=none --set-exit-if-changed .
 
       - name: Dart analyze (fail on infos & warnings)
         run: dart analyze --fatal-infos --fatal-warnings
 
       - name: Run custom_lint
         run: dart run custom_lint
-
