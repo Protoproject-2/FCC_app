@@ -2,8 +2,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'home_ui_view_model.dart';
+import 'home_ui_auth_provider.dart';
 import 'package:flutter_line_sdk/flutter_line_sdk.dart';
+
+// ログイン状態を管理するProvider
+// @riverpod
+// final isLoggedInProvider = StateProvider<bool>((ref) => false);
+
+// /// ログイン処理
+// Future<void> login(WidgetRef ref) async {
+//   try {
+//     final result = await LineSDK.instance.login();
+//     debugPrint("ログイン成功: ${result.userProfile?.displayName}");
+//     ref.read(isLoggedInProvider.notifier).state = true;
+//   } catch (e) {
+//     debugPrint("ログイン失敗: $e");
+//   }
+// }
+
+// /// ログアウト処理
+// Future<void> logout(WidgetRef ref) async {
+//   try {
+//     await LineSDK.instance.logout();
+//     ref.read(isLoggedInProvider.notifier).state = false;
+//     debugPrint("ログアウト成功");
+//   } catch (e) {
+//     debugPrint("ログアウト失敗: $e");
+//   }
+// }
 
 class HomeUI extends ConsumerWidget {
   const HomeUI({super.key});
@@ -12,6 +40,8 @@ class HomeUI extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeUiViewModelProvider);
     final viewModel = ref.read(homeUiViewModelProvider.notifier);
+    final authState = ref.watch(homeUiAuthProvider); // ログイン状態を取得
+    final authVm = ref.read(homeUiAuthProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(title: const Text('悲鳴検知アプリ')),
@@ -47,21 +77,14 @@ class HomeUI extends ConsumerWidget {
               const lineInviteUrl = 'https://lin.ee/abc1234'; // TODO: 実際のLINE登録URLに差し替えてください
               _showLineQrDialog(context, ref, lineInviteUrl);
             }),
-            _buildActionButton(Icons.add, 'LINEアカウントでログイン', 
+            _buildActionButton(
+              Icons.add, 
+              authState.isLoggedIn ? 'ログアウト' : 'LINEアカウントでログイン',
                 onPressed: () async {
-              try {
-                // LINEログイン画面を表示
-                final result = await LineSDK.instance.login(scopes: ["profile", "openid", "email"]);
-                
-                final accessToken = await LineSDK.instance.currentAccessToken;
-
-                final userEmail = result.accessToken.email;
-                // ログイン成功時
-                print("ログイン成功: ${result.userProfile?.displayName}");
-                // ここで result.accessToken なども利用可能
-              } catch (e) {
-                // ログイン失敗時
-                print("ログインエラー: $e");
+              if (authState.isLoggedIn) {
+                await authVm.logout();
+              } else {
+                await authVm.login();
               }
             }),
             const Spacer(),

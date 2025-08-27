@@ -45,3 +45,20 @@ class KeywordToggle {
     );
   }
 }
+
+class LoggedInState {
+  final bool isLoggedIn; // ログイン前か後か
+
+  const LoggedInState({
+    this.isLoggedIn = false,
+  });
+
+  // 個別のフィールドのみを更新した新しいインスタンスを返す。
+  LoggedInState copyWith({
+    bool? isLoggedIn
+  }) {
+    return LoggedInState(
+      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+    );
+  }
+}
