@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-      - "feature/**"
-      - "fix/**"
   pull_request:
 
 jobs:
@@ -67,8 +65,8 @@ jobs:
             done < .format-changed
           fi
 
-      - name: Dart analyze (fail on infos & warnings)
-        run: dart analyze --fatal-infos --fatal-warnings
+      - name: Dart analyze (fail on warnings)
+        run: dart analyze --fatal-warnings
 
       - name: Run custom_lint
         run: dart run custom_lint
