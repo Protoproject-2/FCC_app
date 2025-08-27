@@ -48,17 +48,21 @@ class KeywordToggle {
 
 class LoggedInState {
   final bool isLoggedIn; // ログイン前か後か
+  final String? pictureUrl; // LINEのアイコン画像
 
   const LoggedInState({
     this.isLoggedIn = false,
+    this.pictureUrl,
   });
 
   // 個別のフィールドのみを更新した新しいインスタンスを返す。
   LoggedInState copyWith({
-    bool? isLoggedIn
+    bool? isLoggedIn,
+    String? pictureUrl,
   }) {
     return LoggedInState(
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+      pictureUrl: pictureUrl ?? this.pictureUrl,
     );
   }
 }

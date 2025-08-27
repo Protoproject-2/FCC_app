@@ -7,32 +7,6 @@ import 'home_ui_view_model.dart';
 import 'home_ui_auth_provider.dart';
 import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
-// ログイン状態を管理するProvider
-// @riverpod
-// final isLoggedInProvider = StateProvider<bool>((ref) => false);
-
-// /// ログイン処理
-// Future<void> login(WidgetRef ref) async {
-//   try {
-//     final result = await LineSDK.instance.login();
-//     debugPrint("ログイン成功: ${result.userProfile?.displayName}");
-//     ref.read(isLoggedInProvider.notifier).state = true;
-//   } catch (e) {
-//     debugPrint("ログイン失敗: $e");
-//   }
-// }
-
-// /// ログアウト処理
-// Future<void> logout(WidgetRef ref) async {
-//   try {
-//     await LineSDK.instance.logout();
-//     ref.read(isLoggedInProvider.notifier).state = false;
-//     debugPrint("ログアウト成功");
-//   } catch (e) {
-//     debugPrint("ログアウト失敗: $e");
-//   }
-// }
-
 class HomeUI extends ConsumerWidget {
   const HomeUI({super.key});
 
@@ -42,9 +16,26 @@ class HomeUI extends ConsumerWidget {
     final viewModel = ref.read(homeUiViewModelProvider.notifier);
     final authState = ref.watch(homeUiAuthProvider); // ログイン状態を取得
     final authVm = ref.read(homeUiAuthProvider.notifier);
+    final accountData = authVm.accountButtonData;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('悲鳴検知アプリ')),
+      appBar: AppBar(
+        title: const Text('悲鳴検知アプリ'),
+        backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+        actions: [
+          _buildAccountButton(
+            accountData,
+            onTap: () async {
+              if (accountData.isLoggedIn) {
+                await authVm.logout();
+              } else {
+                await authVm.login();
+              }
+            },
+          ),
+          const SizedBox(width: 8), // 右端に少し余白
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -76,16 +67,6 @@ class HomeUI extends ConsumerWidget {
                 onPressed: () {
               const lineInviteUrl = 'https://lin.ee/abc1234'; // TODO: 実際のLINE登録URLに差し替えてください
               _showLineQrDialog(context, ref, lineInviteUrl);
-            }),
-            _buildActionButton(
-              Icons.add, 
-              authState.isLoggedIn ? 'ログアウト' : 'LINEアカウントでログイン',
-                onPressed: () async {
-              if (authState.isLoggedIn) {
-                await authVm.logout();
-              } else {
-                await authVm.login();
-              }
             }),
             const Spacer(),
             // 合言葉のスイッチ
@@ -186,6 +167,31 @@ Widget _buildFloatingActionButton(IconData icon, String label, {required VoidCal
         minimumSize: const Size.fromHeight(48),
         backgroundColor: Colors.greenAccent.withOpacity(0.3),
       ),
+    ),
+  );
+}
+
+Widget _buildAccountButton(AccountButtonData data, {required VoidCallback onTap}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Row(
+      children: [
+        CircleAvatar(
+          radius: 20,
+          backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+          backgroundImage: data.isLoggedIn && data.pictureUrl != null
+              ? NetworkImage(data.pictureUrl!)
+              : null,
+          child: data.isLoggedIn && data.pictureUrl != null
+              ? null
+              : const Icon(Icons.person, color: Colors.white),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          data.isLoggedIn ? 'ログアウト' : 'ログイン',
+          style: const TextStyle(color: Colors.black),
+        ),
+      ],
     ),
   );
 }

@@ -4,19 +4,41 @@ import 'home_ui_state.dart'; // LoggedInStateを参照
 
 part 'home_ui_auth_provider.g.dart';
 
+class AccountButtonData {
+  final bool isLoggedIn;
+  final String? pictureUrl;
+
+  AccountButtonData({required this.isLoggedIn, this.pictureUrl});
+}
+
 @riverpod
 class HomeUiAuth extends _$HomeUiAuth {
   @override
   LoggedInState build() => const LoggedInState();
 
+  AccountButtonData get accountButtonData {
+    return AccountButtonData(
+      isLoggedIn: state.isLoggedIn,
+      pictureUrl: state.pictureUrl,
+    );
+  }
+  
   Future<void> login() async {
     try {
       final result = await LineSDK.instance.login();
+      final profile = result.userProfile;
+      // final displayName = profile.displayName; // 名前
+      // final pictureUrl = profile.pictureUrl;   // アイコンURL（String?）
       print("ログイン成功: ${result.userProfile?.displayName}");
-      state = state.copyWith(isLoggedIn: true);
+      state = state.copyWith(
+        isLoggedIn: true,
+        pictureUrl: profile?.pictureUrl, // アイコンURLを保存
+      );
+      // -------------ToDo-------------
+      // httpリクエストでIDを取得(https://fccapi.ddns.net/get_id)
     } catch (e) {
       print("ログイン失敗: $e");
-      state = state.copyWith(isLoggedIn: false);
+      state = state.copyWith(isLoggedIn: false, pictureUrl: null);
     }
   }
 
