@@ -14,7 +14,7 @@ class HomeUI extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeUiViewModelProvider);
     final viewModel = ref.read(homeUiViewModelProvider.notifier);
-    final authState = ref.watch(homeUiAuthProvider); // ログイン状態を取得
+    final authState = ref.watch(homeUiAuthProvider);
     final authVm = ref.read(homeUiAuthProvider.notifier);
     final accountData = authVm.accountButtonData;
 
@@ -33,7 +33,7 @@ class HomeUI extends ConsumerWidget {
               }
             },
           ),
-          const SizedBox(width: 8), // 右端に少し余白
+          const SizedBox(width: 8), 
         ],
       ),
       body: Padding(

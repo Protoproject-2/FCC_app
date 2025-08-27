@@ -55,7 +55,6 @@ class LoggedInState {
     this.pictureUrl,
   });
 
-  // 個別のフィールドのみを更新した新しいインスタンスを返す。
   LoggedInState copyWith({
     bool? isLoggedIn,
     String? pictureUrl,
