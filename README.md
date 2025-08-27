@@ -107,6 +107,69 @@ flutter build apk
 flutter build ios
 ```
 
+## コード規約 / Lint（flutter_lints）
+本プロジェクトでは公式推奨の `flutter_lints` を用いて、静的解析とコーディング規約を統一しています。
+
+### ルール定義
+- ルートの `analysis_options.yaml` で `flutter_lints` を継承します。必要に応じてルールを上書きできます。
+
+```yaml
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - .dart_tool/**
+
+linter:
+  rules:
+    # 例: 個別に上書き/追加
+    # avoid_print: false
+    # prefer_single_quotes: true
+    # always_use_package_imports: true
+```
+
+補足:
+- `pubspec.yaml` の `dev_dependencies` に `flutter_lints` を指定（例: `^3.x`）。
+- `custom_lint` / `riverpod_lint` も導入しているため、IDE 上で追加の診断が表示されることがあります。
+
+### 実行方法
+- 解析: `flutter analyze`（Dart パッケージのみなら `dart analyze`）
+- 自動修正: `dart fix --apply`
+  - 自動修正は意味等価な範囲のみが対象です。適用可能なものが無い場合は「Nothing to fix!」と表示されます。
+
+### よくある指摘と対応
+- avoid_print: 本番コードでの `print` は避け、`dart:developer` の `log` やロガー（例: `logger`）を使用。
+- deprecated_member_use（`Color.withOpacity`）: 非推奨。`withValues(alpha: ...)` への移行を検討。
+- use_build_context_synchronously: 非同期後に `BuildContext` を使う場合は、`if (!context.mounted) return;` を挿入。
+- unnecessary_* 系: 不要な `toList`、括弧、補間は削除。
+
+### 一時的な無効化
+- 行単位: `// ignore: ルール名`
+- ファイル単位: ファイル先頭に `// ignore_for_file: ルール名`
+  - 恒久的な無効化は避け、できる限りコード修正で解決してください。
+
+### CI 例（任意）
+GitHub Actions で解析を自動チェックする例:
+
+```yaml
+name: analyze
+on: [push, pull_request]
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+```
+
+### 開発フローの推奨
+- ブランチを切る → 変更 → `flutter analyze` → 必要に応じ `dart fix --apply` → 再度 `flutter analyze` で確認 → PR 作成。
+
 ## トラブルシュート
 - 通知が表示されない
   - Android 13+ では通知のランタイム許可が必要です。
