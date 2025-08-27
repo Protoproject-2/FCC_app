@@ -1,0 +1,72 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  flutter_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run dart format (rewrite locally)
+        run: |
+          dart format .
+
+      - name: Report formatting changes (summary + annotations)
+        run: |
+          # 変更ファイル一覧
+          git --no-pager diff --name-only > .format-changed || true
+          CHANGED_COUNT=$(wc -l < .format-changed | tr -d ' \n')
+          echo "Found ${CHANGED_COUNT:-0} formatted file(s)."
+
+          # ジョブサマリーにファイル一覧と差分を掲載
+          {
+            echo "## Dart Format Report"
+            echo
+            if [ "${CHANGED_COUNT}" != "0" ]; then
+              echo "### 変更されたファイル一覧"
+              echo
+              echo '```'
+              cat .format-changed
+              echo '```'
+              echo
+              echo "### 変更差分"
+              echo
+              git --no-pager diff --color=never | sed -e 's/^\\x1b\[[0-9;]*m//g' > .format-diff || true
+              echo '```diff'
+              cat .format-diff
+              echo '```'
+            else
+              echo "差分はありませんでした。"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # アノテーション（警告）を付与して視覚的に通知
+          if [ "${CHANGED_COUNT}" != "0" ]; then
+            while IFS= read -r file; do
+              [ -z "$file" ] && continue
+              echo "::warning file=${file}::Formatting differs from standard (run 'dart format .')"
+            done < .format-changed
+          fi
+
+      - name: Dart analyze (fail on warnings)
+        run: dart analyze --fatal-warnings
+
+      - name: Run custom_lint
+        run: dart run custom_lint
