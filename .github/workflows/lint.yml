@@ -27,7 +27,7 @@ jobs:
         run: flutter pub get
 
       - name: Format check (no write)
-        run: dart format -o none -n --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed .
 
       - name: Dart analyze (fail on infos & warnings)
         run: dart analyze --fatal-infos --fatal-warnings
