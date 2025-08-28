@@ -38,6 +38,7 @@ dependencies:
   http: ^1.2.1
   flutter_local_notifications: ^19.4.0
   flutter_line_sdk: ^2.6.1
+  geolocator: ^12.0.0 
 
 dev_dependencies:
   flutter_test:

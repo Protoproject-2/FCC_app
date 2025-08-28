@@ -7,6 +7,7 @@ import 'package:fcc/app/infra/local_notification_service.dart';
 import 'package:fcc/app/infra/app_user_service.dart';
 import 'package:fcc/app/infra/emergency_service.dart';
 import 'package:flutter_line_sdk/flutter_line_sdk.dart';
+import 'package:geolocator/geolocator.dart';
 
 
 Future<void> main() async {
@@ -27,13 +28,36 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> {
   void _handleKeywordDetected() {
+    Position position;
     final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
     final notifier = ref.read(userListProvider.notifier);
-
     // ON のユーザーIDを取得
     final activeIds = notifier.selectedIds;
+
     Future(() async {
-      await sendEmergency(userId, activeIds);
+      try {
+        // 権限確認 & 要求
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+          if (permission == LocationPermission.denied) {
+            print("位置情報の権限が拒否されました");
+            return;
+          }
+        }
+
+        if (permission == LocationPermission.deniedForever) {
+          print("位置情報の権限が永続的に拒否されています");
+          return;
+        }
+
+        position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      } catch (e) {
+        print("位置情報取得エラー: $e");
+        return;
+      }
+      
+      await sendEmergency(userId, activeIds, position.latitude, position.longitude);
     });
   }
 

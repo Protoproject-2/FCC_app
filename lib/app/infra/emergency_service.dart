@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 /// ON のユーザーだけを抽出して Flask サーバーに送信する関数
-Future<void> sendEmergency(int userId, List<int> selectedIds) async {
+Future<void> sendEmergency(int userId, List<int> selectedIds, double? latitude, double? longitude) async {
   const baseUrl = "https://fccapi.ddns.net";
   const message = "テスト緊急メッセージです！";
 
@@ -15,7 +15,10 @@ Future<void> sendEmergency(int userId, List<int> selectedIds) async {
     "user_id": userId,
     "contact_ids": selectedIds,
     "message": message,
+    if (latitude != null) "latitude": latitude,
+    if (longitude != null) "longitude": longitude,
   };
+
   print("payload = ");
   print(payload);
 
