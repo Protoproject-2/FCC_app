@@ -19,8 +19,8 @@
 
 ## リポジトリ
 - アプリ: https://github.com/Protoproject-2/FCC_app
-- 連携API: https://github.com/Protoproject-2/RealTime_Treatment_AND_Keyword_Detection
-
+- 連携API: 音声キーワード検知（サーバー）https://github.com/Protoproject-2/RealTime_Treatment_AND_Keyword_Detection
+- 連携API: LINEログイン・ユーザ管理（サーバー）https://github.com/Protoproject-2/FCC_LINE_API.git
 ## ディレクトリ構成（抜粋）
 ```
 lib/
@@ -181,7 +181,7 @@ jobs:
   - チャネルID・URLスキーム・バンドルID/アプリIDの整合性を確認してください。
 
 ## 作品概要資料
-- https://docs.google.com/document/d/1X3jv0y7Yk2b9JH1H5tY4g5Z6K8J9L0M1/edit?usp=sharing
+https://protopedia.net/prototype/private/ccbc8dde-a725-469e-916f-2c0d43ae8cc5
 
 ---
 本READMEは開発者向けドキュメントです。改善提案や追加情報があればPRを歓迎します。
