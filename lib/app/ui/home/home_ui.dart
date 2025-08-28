@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'home_ui_view_model.dart';
 import 'home_ui_auth_provider.dart';
+import 'home_ui_user_list_provider.dart';
 import '../../infra/app_user_service.dart';
 import '../../infra/invite_user_service.dart';
+// import '../../infra/emergency_service.dart';  // test用　終わったら消す
 import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
 class HomeUI extends ConsumerWidget {
@@ -14,11 +16,14 @@ class HomeUI extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ScrollController _scrollController = ScrollController();
     final state = ref.watch(homeUiViewModelProvider);
     final viewModel = ref.read(homeUiViewModelProvider.notifier);
     final authState = ref.watch(homeUiAuthProvider);
     final authVm = ref.read(homeUiAuthProvider.notifier);
     final accountData = authVm.accountButtonData;
+    final users = ref.watch(userListProvider);
+    final userListNotifier = ref.read(userListProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -32,6 +37,8 @@ class HomeUI extends ConsumerWidget {
                 await authVm.logout();
               } else {
                 await authVm.login();
+                final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
+                await ref.read(userListProvider.notifier).testRefreshList(userId);
               }
             },
           ),
@@ -68,7 +75,6 @@ class HomeUI extends ConsumerWidget {
             _buildFloatingActionButton(Icons.share, 'LINE登録URL共有ボタン',
                 onPressed: () async {
               try {
-                // userId は AppUserService.getAppId() などから取得
                 final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
                 await InviteService.fetchInviteUrl(userId);
 
@@ -85,6 +91,9 @@ class HomeUI extends ConsumerWidget {
               }
             }),
             const Spacer(),
+            _BuildUpdateButton(context, ref), // ← ここでボタンを配置
+            // EmergencyTestButton(),
+            _UserListWidget(height: 200,),
             // 合言葉のスイッチ
             ...state.keywordToggles.map((toggle) {
               return SwitchListTile(
@@ -206,6 +215,94 @@ Widget _buildAccountButton(AccountButtonData data, {required VoidCallback onTap}
         Text(
           data.isLoggedIn ? 'ログアウト' : 'ログイン',
           style: const TextStyle(color: Colors.black),
+        ),
+      ],
+    ),
+  );
+}
+
+class _UserListWidget extends ConsumerWidget {
+  const _UserListWidget({super.key, this.height = 300});
+
+  final double height;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final users = ref.watch(userListProvider);      // 状態を監視
+    final notifier = ref.read(userListProvider.notifier); // Notifier取得
+
+    return SizedBox(
+      height: height, // 高さ固定
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Scrollbar(
+          thumbVisibility: true,
+          child: ListView.separated(
+            itemCount: users.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final user = users[index];
+              return SwitchListTile(
+                title: Text(user.name),
+                value: user.isSelected,
+                onChanged: (_) => notifier.toggle(user.id),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// test用。終わったら消す
+// class EmergencyTestButton extends ConsumerWidget {
+//   const EmergencyTestButton({super.key});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return ElevatedButton(
+//       onPressed: () {
+//         // notifier を取得
+//         final notifier = ref.read(userListProvider.notifier);
+
+//         // 選択されているユーザーIDだけを取得
+//         final selectedIds = notifier.selectedIds;
+
+//         final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
+
+//         // provider の関数を実行
+//         notifier.testSendEmergency(userId, selectedIds);
+
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text("送信処理を実行しました")),
+//         );
+//       },
+//       child: const Text("緊急送信テスト"),
+//     );
+//   }
+// }
+
+Widget _BuildUpdateButton(BuildContext context, WidgetRef ref) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.end, // 右詰め
+      children: [
+        ElevatedButton.icon(
+          icon: const Icon(Icons.refresh),
+          label: const Text("リストを更新"),
+          onPressed: () async {
+            final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
+            await ref.read(userListProvider.notifier).testRefreshList(userId);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("ユーザーリストを更新しました")),
+            );
+          },
         ),
       ],
     ),

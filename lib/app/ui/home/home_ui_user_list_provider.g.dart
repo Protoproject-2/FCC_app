@@ -1,57 +1,53 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'home_ui_auth_provider.dart';
+part of 'home_ui_user_list_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-@ProviderFor(HomeUiAuth)
-const homeUiAuthProvider = HomeUiAuthProvider._();
+@ProviderFor(UserList)
+const userListProvider = UserListProvider._();
 
-final class HomeUiAuthProvider
-    extends $NotifierProvider<HomeUiAuth, LoggedInState> {
-  const HomeUiAuthProvider._()
+final class UserListProvider extends $NotifierProvider<UserList, List<User>> {
+  const UserListProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'homeUiAuthProvider',
+          name: r'userListProvider',
           isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$homeUiAuthHash();
+  String debugGetCreateSourceHash() => _$userListHash();
 
   @$internal
   @override
-  HomeUiAuth create() => HomeUiAuth();
+  UserList create() => UserList();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(LoggedInState value) {
+  Override overrideWithValue(List<User> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<LoggedInState>(value),
+      providerOverride: $SyncValueProvider<List<User>>(value),
     );
   }
 }
 
-String _$homeUiAuthHash() => r'b91f6a7268d3a8e051cecd91a503755c19027c1d';
+String _$userListHash() => r'08f70de3ac491f4548e5312719ca0e8968888977';
 
-abstract class _$HomeUiAuth extends $Notifier<LoggedInState> {
-  LoggedInState build();
+abstract class _$UserList extends $Notifier<List<User>> {
+  List<User> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<LoggedInState, LoggedInState>;
+    final ref = this.ref as $Ref<List<User>, List<User>>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<LoggedInState, LoggedInState>,
-        LoggedInState,
-        Object?,
-        Object?>;
+        AnyNotifier<List<User>, List<User>>, List<User>, Object?, Object?>;
     element.handleValue(ref, created);
   }
 }

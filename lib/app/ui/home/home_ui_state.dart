@@ -65,3 +65,23 @@ class LoggedInState {
     );
   }
 }
+
+class User {
+  final int id;
+  final String name;
+  final bool isSelected;
+
+  const User({
+    required this.id,
+    required this.name,
+    this.isSelected = false,
+  });
+
+  User copyWith({int? id, String? name, bool? isSelected}) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      isSelected: isSelected ?? this.isSelected,
+    );
+  }
+}
