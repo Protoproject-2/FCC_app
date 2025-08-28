@@ -17,6 +17,8 @@ class HomeUI extends ConsumerWidget {
     final viewModel = ref.read(homeUiViewModelProvider.notifier);
     final authState = ref.watch(homeUiAuthProvider);
     final authVm = ref.read(homeUiAuthProvider.notifier);
+    final users = ref.watch(userListProvider);
+    final userListNotifier = ref.read(userListProvider.notifier);
     final accountData = AccountButtonData(isLoggedIn: authState.isLoggedIn, pictureUrl: authState.pictureUrl);
 
     return Scaffold(

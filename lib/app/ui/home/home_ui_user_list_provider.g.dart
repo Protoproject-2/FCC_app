@@ -37,7 +37,7 @@ final class UserListProvider extends $NotifierProvider<UserList, List<User>> {
   }
 }
 
-String _$userListHash() => r'b41848477881162d3b2eaa3fa79e694ab76967ba';
+String _$userListHash() => r'018cd0ce53a7f9d057286d2a2c7d0574149fafa3';
 
 abstract class _$UserList extends $Notifier<List<User>> {
   List<User> build();

@@ -27,12 +27,16 @@ class HomeUiAuth extends _$HomeUiAuth {
   Future<void> login() async {
     try {
       final result = await LineSDK.instance.login();
+      final profile = result.userProfile;
+      final userId = profile?.userId;
+      final displayName = profile?.displayName;
       final pictureUrl = result.userProfile?.pictureUrl;
 
       state = state.copyWith(
         isLoggedIn: true,
         pictureUrl: pictureUrl,
       );
+      await AppUserService.sendUserData(displayName ?? "不明", userId ?? "");  
       print('ログイン成功: ${result.userProfile?.displayName}');
     } catch (e) {
       print('ログイン失敗: $e');
