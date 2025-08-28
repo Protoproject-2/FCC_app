@@ -1,7 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'home_ui_state.dart';
-import '../../infra/emergency_service.dart'; // test用
 import '../../infra/contact_list_service.dart';
 
 part 'home_ui_user_list_provider.g.dart';
@@ -54,14 +52,6 @@ class UserList extends _$UserList {
       print("ユーザーリスト更新失敗: $e");
     }
   }
-
-  // //-----緊急通知テスト用。終わったら消す---
-  // void testSendEmergency(int userId, List<int> selectedIds) {
-  //   Future(() async {
-  //     await sendEmergency(userId, selectedIds);
-  //   });
-  // }
-  // //------------------------------
 
   // ON のユーザーIDリストを返す
   List<int> get selectedIds =>

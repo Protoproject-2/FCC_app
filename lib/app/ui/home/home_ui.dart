@@ -2,33 +2,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'home_ui_view_model.dart';
 import 'home_ui_auth_provider.dart';
 import 'home_ui_user_list_provider.dart';
 import '../../infra/app_user_service.dart';
 import '../../infra/invite_user_service.dart';
-// import '../../infra/emergency_service.dart';  // test用　終わったら消す
-import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
 class HomeUI extends ConsumerWidget {
   const HomeUI({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ScrollController _scrollController = ScrollController();
     final state = ref.watch(homeUiViewModelProvider);
     final viewModel = ref.read(homeUiViewModelProvider.notifier);
-    final authState = ref.watch(homeUiAuthProvider);
     final authVm = ref.read(homeUiAuthProvider.notifier);
     final accountData = authVm.accountButtonData;
-    final users = ref.watch(userListProvider);
-    final userListNotifier = ref.read(userListProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('悲鳴検知アプリ'),
-        backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+        backgroundColor: Colors.lightBlueAccent.withValues(alpha: 0.3),
         actions: [
           _buildAccountButton(
             accountData,
@@ -91,8 +84,7 @@ class HomeUI extends ConsumerWidget {
               }
             }),
             const Spacer(),
-            _BuildUpdateButton(context, ref), // ← ここでボタンを配置
-            // EmergencyTestButton(),
+            _BuildUpdateButton(context, ref),
             _UserListWidget(height: 200,),
             // 合言葉のスイッチ
             ...state.keywordToggles.map((toggle) {
@@ -174,7 +166,7 @@ Widget _buildActionButton(IconData icon, String label, {required VoidCallback on
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size.fromHeight(48),
-        backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+        backgroundColor: Colors.lightBlueAccent.withValues(alpha: 0.3),
       ),
     ),
   );
@@ -190,7 +182,7 @@ Widget _buildFloatingActionButton(IconData icon, String label, {required VoidCal
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size.fromHeight(48),
-        backgroundColor: Colors.greenAccent.withOpacity(0.3),
+        backgroundColor: Colors.greenAccent.withValues(alpha: 0.3),
       ),
     ),
   );
@@ -203,7 +195,7 @@ Widget _buildAccountButton(AccountButtonData data, {required VoidCallback onTap}
       children: [
         CircleAvatar(
           radius: 20,
-          backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+          backgroundColor: Colors.lightBlueAccent.withValues(alpha: 0.3),
           backgroundImage: data.isLoggedIn && data.pictureUrl != null
               ? NetworkImage(data.pictureUrl!)
               : null,
@@ -222,17 +214,17 @@ Widget _buildAccountButton(AccountButtonData data, {required VoidCallback onTap}
 }
 
 class _UserListWidget extends ConsumerWidget {
-  const _UserListWidget({super.key, this.height = 300});
+  const _UserListWidget({this.height = 300});
 
   final double height;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final users = ref.watch(userListProvider);      // 状態を監視
-    final notifier = ref.read(userListProvider.notifier); // Notifier取得
+    final users = ref.watch(userListProvider);
+    final notifier = ref.read(userListProvider.notifier);
 
     return SizedBox(
-      height: height, // 高さ固定
+      height: height,
       child: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -259,39 +251,11 @@ class _UserListWidget extends ConsumerWidget {
   }
 }
 
-// test用。終わったら消す
-// class EmergencyTestButton extends ConsumerWidget {
-//   const EmergencyTestButton({super.key});
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     return ElevatedButton(
-//       onPressed: () {
-//         // notifier を取得
-//         final notifier = ref.read(userListProvider.notifier);
-
-//         // 選択されているユーザーIDだけを取得
-//         final selectedIds = notifier.selectedIds;
-
-//         final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
-
-//         // provider の関数を実行
-//         notifier.testSendEmergency(userId, selectedIds);
-
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           const SnackBar(content: Text("送信処理を実行しました")),
-//         );
-//       },
-//       child: const Text("緊急送信テスト"),
-//     );
-//   }
-// }
-
 Widget _BuildUpdateButton(BuildContext context, WidgetRef ref) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.end, // 右詰め
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         ElevatedButton.icon(
           icon: const Icon(Icons.refresh),

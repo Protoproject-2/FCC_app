@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../ui/home/home_ui_state.dart'; 
-import '../ui/home/home_ui_user_list_provider.dart'; 
 
 /// ON のユーザーだけを抽出して Flask サーバーに送信する関数
 Future<void> sendEmergency(int userId, List<int> selectedIds) async {
