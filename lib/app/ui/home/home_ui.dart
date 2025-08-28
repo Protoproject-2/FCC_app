@@ -34,8 +34,6 @@ class HomeUI extends ConsumerWidget {
               } else {
                 await authVm.login();
                 final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
-                print("user id is");
-                print(userId);
                 await ref.read(userListProvider.notifier).testRefreshList(userId);
               }
             },
@@ -89,7 +87,6 @@ class HomeUI extends ConsumerWidget {
               }
             }),
             const Spacer(),
-            EmergencyTestButton(),
             _BuildUpdateButton(context, ref),
             _UserListWidget(height: 200,),
             // 合言葉のスイッチ
@@ -277,33 +274,4 @@ Widget _BuildUpdateButton(BuildContext context, WidgetRef ref) {
       ],
     ),
   );
-}
-
-// test用。終わったら消す
-class EmergencyTestButton extends ConsumerWidget {
-  const EmergencyTestButton({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ElevatedButton(
-      onPressed: () {
-        // notifier を取得
-        final notifier = ref.read(userListProvider.notifier);
-
-        // 選択されているユーザーIDだけを取得
-        final selectedIds = notifier.selectedIds;
-
-        final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
-
-        // provider の関数を実行
-        // notifier.testSendEmergency(userId, selectedIds);
-        ref.read(userListProvider.notifier).testSendEmergency(userId, selectedIds);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("送信処理を実行しました")),
-        );
-      },
-      child: const Text("緊急送信テスト"),
-    );
-  }
 }
