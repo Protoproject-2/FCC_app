@@ -27,20 +27,19 @@ class HomeUiAuth extends _$HomeUiAuth {
   Future<void> login() async {
     try {
       final result = await LineSDK.instance.login();
-      final profile = result.userProfile;
-      final userId = profile?.userId;
-      final displayName = profile?.displayName;
-      print("ログイン成功: ${displayName}");
+      final pictureUrl = result.userProfile?.pictureUrl;
+
       state = state.copyWith(
         isLoggedIn: true,
-        pictureUrl: profile?.pictureUrl,
+        pictureUrl: pictureUrl,
       );
-      await AppUserService.sendUserData(displayName ?? "不明", userId ?? "");  // 要検討
-      // final appId = AppUserService.getAppId();
-      // print("現在のappId: $appId");
+      print('ログイン成功: ${result.userProfile?.displayName}');
     } catch (e) {
-      print("ログイン失敗: $e");
-      state = state.copyWith(isLoggedIn: false, pictureUrl: null);
+      print('ログイン失敗: $e');
+      state = state.copyWith(
+        isLoggedIn: false,
+        pictureUrl: null,
+      );
     }
   }
 
@@ -48,7 +47,7 @@ class HomeUiAuth extends _$HomeUiAuth {
     try {
       await LineSDK.instance.logout();
       print("ログアウト成功");
-      state = state.copyWith(isLoggedIn: false);
+      state = state.copyWith(isLoggedIn: false, pictureUrl: null);
       AppUserService.resetAppId();
     } catch (e) {
       print("ログアウト失敗: $e");

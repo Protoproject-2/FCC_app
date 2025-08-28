@@ -38,7 +38,7 @@ final class HomeUiAuthProvider
   }
 }
 
-String _$homeUiAuthHash() => r'b91f6a7268d3a8e051cecd91a503755c19027c1d';
+String _$homeUiAuthHash() => r'042cae21186e4011092896d552ab39592b88adbc';
 
 abstract class _$HomeUiAuth extends $Notifier<LoggedInState> {
   LoggedInState build();
