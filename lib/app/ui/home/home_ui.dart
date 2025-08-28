@@ -2,12 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'home_ui_view_model.dart';
 import 'home_ui_auth_provider.dart';
+import 'home_ui_user_list_provider.dart';
 import '../../infra/app_user_service.dart';
 import '../../infra/invite_user_service.dart';
-import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
 class HomeUI extends ConsumerWidget {
   const HomeUI({super.key});
@@ -16,14 +15,13 @@ class HomeUI extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(homeUiViewModelProvider);
     final viewModel = ref.read(homeUiViewModelProvider.notifier);
-    final authState = ref.watch(homeUiAuthProvider);
     final authVm = ref.read(homeUiAuthProvider.notifier);
     final accountData = authVm.accountButtonData;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('悲鳴検知アプリ'),
-        backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+        backgroundColor: Colors.lightBlueAccent.withValues(alpha: 0.3),
         actions: [
           _buildAccountButton(
             accountData,
@@ -32,6 +30,8 @@ class HomeUI extends ConsumerWidget {
                 await authVm.logout();
               } else {
                 await authVm.login();
+                final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
+                await ref.read(userListProvider.notifier).testRefreshList(userId);
               }
             },
           ),
@@ -68,7 +68,6 @@ class HomeUI extends ConsumerWidget {
             _buildFloatingActionButton(Icons.share, 'LINE登録URL共有ボタン',
                 onPressed: () async {
               try {
-                // userId は AppUserService.getAppId() などから取得
                 final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
                 await InviteService.fetchInviteUrl(userId);
 
@@ -85,6 +84,8 @@ class HomeUI extends ConsumerWidget {
               }
             }),
             const Spacer(),
+            _BuildUpdateButton(context, ref),
+            _UserListWidget(height: 200,),
             // 合言葉のスイッチ
             ...state.keywordToggles.map((toggle) {
               return SwitchListTile(
@@ -165,7 +166,7 @@ Widget _buildActionButton(IconData icon, String label, {required VoidCallback on
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size.fromHeight(48),
-        backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+        backgroundColor: Colors.lightBlueAccent.withValues(alpha: 0.3),
       ),
     ),
   );
@@ -181,7 +182,7 @@ Widget _buildFloatingActionButton(IconData icon, String label, {required VoidCal
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size.fromHeight(48),
-        backgroundColor: Colors.greenAccent.withOpacity(0.3),
+        backgroundColor: Colors.greenAccent.withValues(alpha: 0.3),
       ),
     ),
   );
@@ -194,7 +195,7 @@ Widget _buildAccountButton(AccountButtonData data, {required VoidCallback onTap}
       children: [
         CircleAvatar(
           radius: 20,
-          backgroundColor: Colors.lightBlueAccent.withOpacity(0.3),
+          backgroundColor: Colors.lightBlueAccent.withValues(alpha: 0.3),
           backgroundImage: data.isLoggedIn && data.pictureUrl != null
               ? NetworkImage(data.pictureUrl!)
               : null,
@@ -206,6 +207,66 @@ Widget _buildAccountButton(AccountButtonData data, {required VoidCallback onTap}
         Text(
           data.isLoggedIn ? 'ログアウト' : 'ログイン',
           style: const TextStyle(color: Colors.black),
+        ),
+      ],
+    ),
+  );
+}
+
+class _UserListWidget extends ConsumerWidget {
+  const _UserListWidget({this.height = 300});
+
+  final double height;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final users = ref.watch(userListProvider);
+    final notifier = ref.read(userListProvider.notifier);
+
+    return SizedBox(
+      height: height,
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Scrollbar(
+          thumbVisibility: true,
+          child: ListView.separated(
+            itemCount: users.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final user = users[index];
+              return SwitchListTile(
+                title: Text(user.name),
+                value: user.isSelected,
+                onChanged: (_) => notifier.toggle(user.id),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Widget _BuildUpdateButton(BuildContext context, WidgetRef ref) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        ElevatedButton.icon(
+          icon: const Icon(Icons.refresh),
+          label: const Text("リストを更新"),
+          onPressed: () async {
+            final userId = int.tryParse(AppUserService.getAppId() ?? "0") ?? 0;
+            await ref.read(userListProvider.notifier).testRefreshList(userId);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("ユーザーリストを更新しました")),
+            );
+          },
         ),
       ],
     ),
